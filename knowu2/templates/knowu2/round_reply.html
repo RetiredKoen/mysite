@@ -1,0 +1,52 @@
+{% extends "knowu2/base_generic.html" %}
+
+{% load crispy_forms_tags %}
+{% load knowu2_extras %}
+
+{% block content %}
+    <form action="" method="post">
+        {% csrf_token %}
+        <div class="row bg-info text-white">
+            <div class="col-12 pt-2">{{ question }}</div>
+        </div>
+
+        <div class=" row bg-info text-white">
+            <div class="col-12 mt-1">{{ form.reply|as_crispy_field }}</div>
+        </div>
+
+        <div class="row bg-info text-white text-center">
+            <div class="form-row col-12">
+                <div class="col-2">Correct</div>
+                <div class="col-8 mb-1">{{ me.name }} (you) {{ me.status.capitalize }} <br> {{ me.scores }}</div>
+                <div class="col-2">Wrong</div>
+            </div>
+        </div>
+
+        {% for rival in rivals %}
+            <div class="row bg-info text-white text-center">
+                <div class="form-row col-12">
+                    <div class="form-group col-2 mb-0">
+                        {{ form|field_correct:rival.name|as_crispy_field }}
+                    </div>
+                    <div class="text-center col-8 mb-1">{{ rival.name }} {{ rival.status.capitalize }} <br> {{ rival.scores }}</div>
+                    <div class="form-group col-2 mb-0 alleng middle">
+                        {{ form|field_wrong:rival.name|as_crispy_field }}
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+        {% for error in form.non_field_errors %}
+            <p class="text-danger col-12"><strong>{{ error }}</strong></p>{% endfor %}
+        {% if me.status.capitalize == 'Pending' %}
+        <div class="row">
+            <div class="col-4 mb-2"></div>
+            <button type="Submit" class="btn btn-primary col-4 mt-1">Reply</button>
+        </div>
+        {% else %}
+        <div class="row">
+            <div class="col-4 mb-2"></div>
+            <input type="Button" class="btn btn-primary col-4 mt-1" onClick="history.go(0)" VALUE="Show Status">
+        </div>
+        {% endif %}
+    </form>
+{% endblock %}

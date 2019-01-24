@@ -1,0 +1,30 @@
+{% extends "knowu2/base_generic.html" %}
+
+{% load crispy_forms_tags %}
+{% load knowu2_extras %}
+
+{% block content %}
+    <form action="" method="post">
+        {% csrf_token %}
+        <div class="row bg-info text-white">
+            <div class="col-12 pt-2">{{ question }}</div>
+        </div>
+
+        <div class="row bg-info text-white">
+            <div class="col-12 pt-2">{{ answer }}</div>
+        </div>
+
+        {% for competitor in competitors %}
+            <div class="row bg-info text-white bg-info text-white">
+                <div class="col-12 m-2">
+                    {{ form|field_correct:competitor }}
+                    {{ form|label_correct:competitor }}
+                </div>
+            </div>
+        {% endfor %}
+
+        <div class="row">
+            <button type="Submit" class="btn btn-primary col-4 mt-2">Judge</button>
+        </div>
+    </form>
+{% endblock %}

@@ -1,0 +1,239 @@
+{% extends "knowu2/base_generic.html" %}
+
+{% block content %}
+    {% if messages %}
+        <ul class="text-danger">
+            {% for message in messages %}
+                <li class="{{ message.tags }}">{{ message }}</li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+
+    <div class="row bg-info text-white">
+        <div class="bg-info col-2 text-white"><h3>Home</h3></div>
+        <div class="col-2 pt-2">Questions {{ num_questions }}</div>
+        <div class="col-2 pt-2">Answers {{ num_answers }}</div>
+        <div class="col-2 pt-2">Matches {{ num_matches }}</div>
+        <div class="col-2 pt-2">Competitors {{ num_competitors }}</div>
+    </div>
+
+    <div class="row">
+        <div class="col-12">
+            Welcome to KnowU2, a website developed for training purposes.
+        </div>
+    </div>
+
+    <div class="row mt-1 bg-info text-white">
+        <div class="col-2"><h3>Match</h3></div>
+        <div class="col-10 pt-2">{{ cur_match.match }} - Host {{ cur_match.host }}
+            {% if cur_match.testing %}  - !!! TESTING  !!!{% endif %}
+        </div>
+    </div>
+
+    <div class="row bg-info text-white pb-2">
+        <div class="col-2">Status {{ cur_match.status.capitalize }}</div>
+        {% if cur_match.host == user %}
+            {% if cur_match.status.capitalize == 'Joining' %}
+                <a href="{% url 'game_next_status' %}" class="btn btn-warning offset-2 col-4 col-4 text-white">All Logged In? Click to
+                    start
+                    Match</a>
+            {% endif %}
+            {% if cur_match.status.capitalize == 'Running' %}
+                <a href="{% url 'game_next_status' %}" class="btn btn-warning offset-2 col-4 col-4 text-white">Last question finished?
+                    Click to
+                    stop Match</a>
+            {% endif %}
+            {% if cur_match.status.capitalize == 'Closed' %}
+                <a href="{% url 'game_next_status' %}" class="btn btn-warning offset-2 col-4 text-white">Nog een keer? Click om alles
+                    op
+                    te schonen.</a>
+            {% endif %}
+        {% endif %}
+    </div>
+
+    <div class="row bg-info text-white">
+        <div class="table-responsive col-2 ">
+            <table class="table table-sm">
+                <thead>
+                <tr>
+                    <th scope="col">Competitor</th>
+                    <th scope="col"></th>
+                </tr>
+                <tr>
+                    <th scope="col"></th>
+                    <th scope="col">Idle</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for cur_competitor in cur_competitors %}
+                    <tr>
+                        <th scope="row">{{ cur_competitor.user }}</th>
+                        <td>{{ cur_competitor.last_activity|timesince }}</td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        <div class="table-responsive col-10">
+            <table class="table table-sm ">
+                <thead>
+                <tr>
+
+                    <th scope="col" colspan="2" class="text-right"></th>
+                    <th scope="col" colspan="8" class="text-center">Betting ON Rivals</th>
+                    <th scope="col" colspan="9" class="text-center">Betting BY Rivals</th>
+                </tr>
+                <tr>
+                    <th scope="col" class="text-right">Total</th>
+                    <th scope="col" colspan="2" class="text-right">CcRc</th>
+                    <th scope="col" colspan="2" class="text-right">CcRw</th>
+                    <th scope="col" colspan="2" class="text-right">CwRc</th>
+                    <th scope="col" colspan="2" class="text-right">CwRw</th>
+                    <th scope="col" class="text-right">Total</th>
+                    <th scope="col" colspan="2" class="text-right">CcRc</th>
+                    <th scope="col" colspan="2" class="text-right">CcRw</th>
+                    <th scope="col" colspan="2" class="text-right">CwRc</th>
+                    <th scope="col" colspan="2" class="text-right">CwRw</th>
+                    <th scope="col" class="text-right">Total</th>
+                </tr>
+                </thead>
+                <tbody class="bg-light text-dark">
+                {% for cur_competitor in cur_competitors %}
+                    <tr>
+                        <td class="text-right"> {{ cur_competitor.correct_points }}</td>
+                        <td class="text-success text-right">{{ cur_competitor.rvl_cc_times }}</td>
+                        <td class="text-success text-right">{{ cur_competitor.rvl_cc_points }}</td>
+                        <td class="text-danger text-right">{{ cur_competitor.rvl_cw_times }}</td>
+                        <td class="text-danger text-right">{{ cur_competitor.rvl_cw_points }}</td>
+                        <td class="text-danger text-right">{{ cur_competitor.rvl_wc_times }}</td>
+                        <td class="text-danger text-right">{{ cur_competitor.rvl_wc_points }}</td>
+                        <td class="text-success text-right">{{ cur_competitor.rvl_ww_times }}</td>
+                        <td class="text-success text-right">{{ cur_competitor.rvl_ww_points }}</td>
+                        <td class="text-right"> {{ cur_competitor.correct_points_rvl }}</td>
+                        <td class="text-success text-right">{{ cur_competitor.cmp_cc_times }}</td>
+                        <td class="text-success text-right">{{ cur_competitor.cmp_cc_points }}</td>
+                        <td class="text-danger text-right">{{ cur_competitor.cmp_cw_times }}</td>
+                        <td class="text-danger text-right">{{ cur_competitor.cmp_cw_points }}</td>
+                        <td class="text-danger text-right">{{ cur_competitor.cmp_wc_times }}</td>
+                        <td class="text-danger text-right">{{ cur_competitor.cmp_wc_points }}</td>
+                        <td class="text-success text-right">{{ cur_competitor.cmp_ww_times }}</td>
+                        <td class="text-success text-right">{{ cur_competitor.cmp_ww_points }}</td>
+                        <td class="text-right">{{ cur_competitor.correct_points_cmp }}</td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    {% if cur_match.status != 'JOINING' %}
+        <div class="row mt-1 bg-info text-white">
+            <div class="col-2"><h3>Round {{ cur_round.round }}</h3></div>
+            <div class="col-10 pt-2">{{ cur_question.category }}
+                - {{ cur_question.group }} - {{ cur_question.question }}</div>
+        </div>
+
+        {% if cur_answers.count > 1 %}
+            {% for cur_answer in cur_answers %}
+                <div class="row bg-info text-white ">
+                    <div class="col-2"></div>
+                    <div class="col-10">{{ cur_answer.answer }}</div>
+                </div>
+            {% endfor %}
+        {% endif %}
+
+        <div class="row bg-info text-white pb-2">
+            <div class=" col-2">Status {{ cur_round.status.capitalize }}</div>
+            {% if cur_match.host == user %}
+                {% if cur_round.status.capitalize == 'Pending' %}
+                    <a href="" class="btn btn-primary offset-2 col-4 text-white">Waiting for replies, (be patient).</a>
+                {% endif %}
+                {% if cur_round.status.capitalize == 'Replied' %}
+                    <a href="{% url 'round_judge' %}" class="btn btn-primary offset-2  col-4 text-white">All competitors replied? Click (to)
+                        judge.</a>
+                {% endif %}
+                {% if cur_round.status.capitalize == 'Judged' %}
+                    <a href="{% url 'round_next' %}" class="btn btn-primary offset-2 col-4 text-white">All replies judged. Click for next
+                        Round</a>
+                {% endif %}
+            {% else %}
+                <div class="col-10"></div>
+            {% endif %}
+        </div>
+
+        <div class="row bg-info text-white">
+        <div class="table-responsive col-2 ">
+            <table class="table table-sm">
+                <thead>
+                <tr>
+                    <th scope="col">Competitor</th>
+                    <th scope="col"></th>
+                </tr>
+                <tr>
+                    <th scope="col"></th>
+                    <th scope="col">Status</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for cur_reply in cur_replies %}
+                    <tr>
+                        <th scope="row">{{ cur_reply.competitor.user }}</th>
+                        <td>{{ cur_reply.status.capitalize }}</td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        <div class="table-responsive col-10">
+            <table class="table table-sm ">
+                <thead>
+                <tr>
+
+                    <th scope="col" colspan="2" class="text-right"></th>
+                    <th scope="col" colspan="8" class="text-center">Betting ON Rivals</th>
+                    <th scope="col" colspan="9" class="text-center">Betting BY Rivals</th>
+                </tr>
+                <tr>
+                    <th scope="col" class="text-right">Total</th>
+                    <th scope="col" colspan="2" class="text-right">CcRc</th>
+                    <th scope="col" colspan="2" class="text-right">CcRw</th>
+                    <th scope="col" colspan="2" class="text-right">CwRc</th>
+                    <th scope="col" colspan="2" class="text-right">CwRw</th>
+                    <th scope="col" class="text-right">Total</th>
+                    <th scope="col" colspan="2" class="text-right">CcRc</th>
+                    <th scope="col" colspan="2" class="text-right">CcRw</th>
+                    <th scope="col" colspan="2" class="text-right">CwRc</th>
+                    <th scope="col" colspan="2" class="text-right">CwRw</th>
+                    <th scope="col" class="text-right">Total</th>
+                </tr>
+                </thead>
+                <tbody class="bg-light text-dark">
+                {% for cur_reply in cur_replies %}
+                    <tr>
+                        <td class="text-right"> {{ cur_reply.correct_points }}</td>
+                        <td class="text-success text-right">{{ cur_reply.rvl_cc_times }}</td>
+                        <td class="text-success text-right">{{ cur_reply.rvl_cc_points }}</td>
+                        <td class="text-danger text-right">{{ cur_reply.rvl_cw_times }}</td>
+                        <td class="text-danger text-right">{{ cur_reply.rvl_cw_points }}</td>
+                        <td class="text-danger text-right">{{ cur_reply.rvl_wc_times }}</td>
+                        <td class="text-danger text-right">{{ cur_reply.rvl_wc_points }}</td>
+                        <td class="text-success text-right">{{ cur_reply.rvl_ww_times }}</td>
+                        <td class="text-success text-right">{{ cur_reply.rvl_ww_points }}</td>
+                        <td class="text-right"> {{ cur_reply.correct_points_rvl }}</td>
+                        <td class="text-success text-right">{{ cur_reply.cmp_cc_times }}</td>
+                        <td class="text-success text-right">{{ cur_reply.cmp_cc_points }}</td>
+                        <td class="text-danger text-right">{{ cur_reply.cmp_cw_times }}</td>
+                        <td class="text-danger text-right">{{ cur_reply.cmp_cw_points }}</td>
+                        <td class="text-danger text-right">{{ cur_reply.cmp_wc_times }}</td>
+                        <td class="text-danger text-right">{{ cur_reply.cmp_wc_points }}</td>
+                        <td class="text-success text-right">{{ cur_reply.cmp_ww_times }}</td>
+                        <td class="text-success text-right">{{ cur_reply.cmp_ww_points }}</td>
+                        <td class="text-right">{{ cur_reply.correct_points_cmp }}</td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}
